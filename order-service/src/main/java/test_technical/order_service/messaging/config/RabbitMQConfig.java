@@ -12,8 +12,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import test_technical.order_service.messaging.consumer.DeliveryEventConsumer;
-import test_technical.order_service.messaging.consumer.InventoryEventConsumer;
-import inventory_service.inventory_service.messaging.messages.InventoryValidatedEvent;
 
 
 import java.util.HashMap;
@@ -108,24 +106,6 @@ public class RabbitMQConfig {
         return template;
     }
 
-    // Listeners para eventos de INVENTARIO
-    @Bean
-    public MessageListenerAdapter inventoryListenerAdapter(InventoryEventConsumer consumer,
-                                                           MessageConverter messageConverter) {
-        MessageListenerAdapter adapter = new MessageListenerAdapter(consumer, "handleInventoryValidated");
-        adapter.setMessageConverter(messageConverter);
-        return adapter;
-    }
-
-    @Bean
-    public SimpleMessageListenerContainer inventoryContainer(ConnectionFactory connectionFactory,
-                                                             MessageListenerAdapter inventoryListenerAdapter) {
-        SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
-        container.setConnectionFactory(connectionFactory);
-        container.setQueueNames(inventoryQueue);
-        container.setMessageListener(inventoryListenerAdapter);
-        return container;
-    }
 
     // Listeners para eventos de DELIVERY
     @Bean

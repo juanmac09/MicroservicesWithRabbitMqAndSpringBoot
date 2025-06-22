@@ -40,6 +40,8 @@ public class OrderEventConsumer {
                 result.getOutOfStockItems()
         );
 
+        System.out.println("Inventory validated event: " + response.getOrderUuid());
+
         inventoryEventPublisher.sendInventoryValidatedEvent(response);
     }
 }

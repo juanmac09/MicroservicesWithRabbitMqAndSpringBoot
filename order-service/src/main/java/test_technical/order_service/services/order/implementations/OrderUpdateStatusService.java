@@ -7,11 +7,12 @@ import test_technical.order_service.exceptions.NotFoundException;
 import test_technical.order_service.repositories.OrderRepository;
 import test_technical.order_service.services.order.OrderUpdateStatusInterface;
 
-import java.util.List;
+import java.util.Optional;
 
 @Service
 public class OrderUpdateStatusService implements OrderUpdateStatusInterface {
-    public final OrderRepository orderRepository;
+
+    private final OrderRepository orderRepository;
 
     public OrderUpdateStatusService(OrderRepository orderRepository) {
         this.orderRepository = orderRepository;
@@ -19,20 +20,21 @@ public class OrderUpdateStatusService implements OrderUpdateStatusInterface {
 
     @Override
     public void orderUpdateStatus(String orderUuid, String status) {
-        List<Order> orders = orderRepository.getOrderByOrderUuid(orderUuid);
+        Optional<Order> optionalOrder = orderRepository.findByOrderUuidTrimmed(orderUuid.trim());
 
-        if (orders == null || orders.isEmpty()) {
-            throw new NotFoundException("Order with UUID " + orderUuid + " not found");
+        if (optionalOrder.isEmpty()) {
+            System.out.println("Orden no encontrada para UUID: " + orderUuid);
+            return;
         }
 
-        Order order = orders.getLast();
+        Order order = optionalOrder.get();
 
         try {
             OrderStatus newStatus = OrderStatus.valueOf(status.toUpperCase());
             order.setStatus(newStatus);
             orderRepository.save(order);
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid order status: " + status);
+            System.out.println("Estado inválido para la orden " + orderUuid + ": " + status);
         }
     }
 }

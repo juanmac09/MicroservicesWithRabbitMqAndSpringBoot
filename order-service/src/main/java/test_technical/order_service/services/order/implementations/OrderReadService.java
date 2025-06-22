@@ -8,7 +8,7 @@ import test_technical.order_service.mappers.order.OrderResponseMapper;
 import test_technical.order_service.repositories.OrderRepository;
 import test_technical.order_service.services.order.OrderReadInterface;
 
-import java.util.List;
+import java.util.Optional;
 
 @Service
 public class OrderReadService implements OrderReadInterface {
@@ -23,12 +23,11 @@ public class OrderReadService implements OrderReadInterface {
 
     @Override
     public OrderResponse getItemByUuid(String uuid) {
-        List<Order> orders = orderRepository.getOrderByOrderUuid(uuid);
-        if (orders == null || orders.isEmpty()) {
-            throw new NotFoundException("Order with UUID " + uuid + " not found");
-        }
+        Optional<Order> optionalOrder = orderRepository.findByOrderUuidTrimmed(uuid.trim());
 
-        Order lastOrder = orders.getLast();
-        return orderResponseMapper.map(lastOrder);
+        Order order = optionalOrder.orElseThrow(() ->
+                new NotFoundException("Order with UUID " + uuid + " not found"));
+
+        return orderResponseMapper.map(order);
     }
 }

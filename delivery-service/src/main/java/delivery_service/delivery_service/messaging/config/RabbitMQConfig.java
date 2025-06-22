@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitMQConfig {
 
     public static final String EXCHANGE_NAME = "main.exchange";
-    public static final String INVENTORY_QUEUE = "inventory.validated";
+    public static final String INVENTORY_QUEUE = "inventory.delivery.queue";
     public static final String INVENTORY_ROUTING_KEY = "inventory.validated";
     public static final String DELIVERY_ROUTING_KEY = "delivery.created";
 
