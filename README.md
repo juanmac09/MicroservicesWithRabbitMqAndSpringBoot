@@ -17,7 +17,7 @@ Antes de ejecutar este sistema distribuido basado en microservicios, asegúrate 
 ### 1️⃣ Clonar el repositorio
 
 ```bash
-git clone https://github.com/tu-usuario/tu-repo.git
+git clone https://github.com/juanmac09/MicroservicesWithRabbitMqAndSpringBoot.git
 cd tu-repo
 ```
 
