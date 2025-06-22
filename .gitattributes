@@ -1,12 +1,12 @@
-# Usa LF para scripts de Unix
+# For all text files, use LF as line ending in the repository
+* text=auto eol=lf
+
+# Explicitly set shell and script files to use LF
 *.sh text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.java text eol=lf
+*.md text eol=lf
 
-# Usa CRLF para scripts de Windows
+# Windows batch files (they need CRLF)
 *.cmd text eol=crlf
-
-# Archivos fuente en texto, normaliza automáticamente
-*.java text=auto
-*.yml text=auto
-*.yaml text=auto
-*.md text=auto
-*.properties text=auto
