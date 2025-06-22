@@ -1,0 +1,102 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - 3306:3306
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql-init:/docker-entrypoint-initdb.d
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS}
+
+  order.service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE_NAME: order-service
+    ports:
+      - ${PORT_ORDER}:${PORT_ORDER}
+    environment:
+      APP_NAME_ORDER: ${APP_NAME_ORDER}
+      DB_URL_ORDER: ${DB_URL_ORDER}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      RABBITMQ_USER: ${RABBITMQ_USER}
+      RABBITMQ_PASS: ${RABBITMQ_PASS}
+      RABBITMQ_EXCHANGE: ${RABBITMQ_EXCHANGE}
+      RABBITMQ_ORDER_QUEUE_EVENTS: ${RABBITMQ_ORDER_QUEUE_EVENTS}
+      RABBITMQ_INVENTORY_QUEUE: ${RABBITMQ_INVENTORY_QUEUE}
+      RABBITMQ_INVENTORY_ROUTING_KEY: ${RABBITMQ_INVENTORY_ROUTING_KEY}
+      RABBITMQ_DELIVERY_QUEUE: ${RABBITMQ_DELIVERY_QUEUE}
+      RABBITMQ_DELIVERY_ROUTING_KEY: ${RABBITMQ_DELIVERY_ROUTING_KEY}
+      PORT_ORDER: ${PORT_ORDER}
+      RABBITMQ_ORDER_ROUTING_KEY: ${RABBITMQ_ORDER_ROUTING_KEY}
+      RABBITMQ_HOST: ${RABBITMQ_HOST}
+    depends_on:
+      - db
+      - rabbitmq
+
+  inventory.service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE_NAME: inventory-service
+    ports:
+      - ${PORT_INVENTORY}:${PORT_INVENTORY}
+    environment:
+      APP_NAME_INVENTORY: ${APP_NAME_INVENTORY}
+      DB_URL_INVENTORY: ${DB_URL_INVENTORY}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      RABBITMQ_USER: ${RABBITMQ_USER}
+      RABBITMQ_PASS: ${RABBITMQ_PASS}
+      RABBITMQ_EXCHANGE: ${RABBITMQ_EXCHANGE}
+      RABBITMQ_ORDER_QUEUE: ${RABBITMQ_ORDER_QUEUE}
+      RABBITMQ_ORDER_ROUTING_KEY: ${RABBITMQ_ORDER_ROUTING_KEY}
+      RABBITMQ_INVENTORY_ROUTING_KEY: ${RABBITMQ_INVENTORY_ROUTING_KEY}
+      PORT_INVENTORY: ${PORT_INVENTORY}
+      RABBITMQ_HOST: ${RABBITMQ_HOST}
+    depends_on:
+      - db
+      - rabbitmq
+
+  delivery.service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE_NAME: delivery-service
+    ports:
+      - "${PORT_DELIVERY}:${PORT_DELIVERY}"
+    environment:
+      APP_NAME_DELIVERY: ${APP_NAME_DELIVERY}
+      DB_URL_DELIVERY: ${DB_URL_DELIVERY}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      RABBITMQ_USER: ${RABBITMQ_USER}
+      RABBITMQ_PASS: ${RABBITMQ_PASS}
+      RABBITMQ_EXCHANGE: ${RABBITMQ_EXCHANGE}
+      RABBITMQ_INVENTORY_QUEUE: ${RABBITMQ_INVENTORY_QUEUE}
+      RABBITMQ_INVENTORY_ROUTING_KEY: ${RABBITMQ_INVENTORY_ROUTING_KEY}
+      RABBITMQ_DELIVERY_ROUTING_KEY: ${RABBITMQ_DELIVERY_ROUTING_KEY}
+      PORT_DELIVERY: ${PORT_DELIVERY}
+      RABBITMQ_HOST: ${RABBITMQ_HOST}
+    depends_on:
+      - db
+      - rabbitmq
+
+volumes:
+  mysql_data:
