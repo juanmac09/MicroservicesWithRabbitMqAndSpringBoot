@@ -1,0 +1,12 @@
+# Usa LF para scripts de Unix
+*.sh text eol=lf
+
+# Usa CRLF para scripts de Windows
+*.cmd text eol=crlf
+
+# Archivos fuente en texto, normaliza automáticamente
+*.java text=auto
+*.yml text=auto
+*.yaml text=auto
+*.md text=auto
+*.properties text=auto
