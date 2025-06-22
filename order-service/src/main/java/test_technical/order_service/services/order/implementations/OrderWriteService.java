@@ -2,6 +2,8 @@ package test_technical.order_service.services.order.implementations;
 
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import test_technical.order_service.dtos.order.OrderRequestDto;
 import test_technical.order_service.dtos.order.OrderResponse;
 import test_technical.order_service.entities.Order;
@@ -52,8 +54,15 @@ public class OrderWriteService implements OrderWriteInterface {
                 .map(item -> new OrderCreatedEvent.OrderItem(item.getItemSku(), item.getQuantity()))
                 .collect(Collectors.toList());
 
-        OrderCreatedEvent event = new OrderCreatedEvent(newOrder.getOrderUuid(), eventItems);
-        this.orderEventPublisher.publish(event);
+
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                OrderCreatedEvent event = new OrderCreatedEvent(newOrder.getOrderUuid(), eventItems);
+                orderEventPublisher.publish(event);
+            }
+        });
+
         return orderResponseMapper.map(newOrder);
     }
 }
